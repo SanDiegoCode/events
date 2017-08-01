@@ -30,6 +30,7 @@ class App extends React.Component {
     constructor() {
         super();
         this.state = {
+            username: "",
             events: [
                 // {
                 //     location: "13330 Salmon River Rd, San Diego, CA 92129",
@@ -64,26 +65,50 @@ class App extends React.Component {
                 var p = that.state.events;
                 console.log(child.val());
                 p.push(child.val());
-                that.setState({posts: p});
+                that.setState({posts: p, username: firebase.auth().currentUser.email});
+                //that.forceUpdate()
+                console.log('force update')
             }, (error) => {
                 console.log("error");
             });
+        $(".button-collapse").sideNav();
+
     }
 
     render() {
         return (
-            <div className = "container"> 
+            <div>
+  
+              <nav>
+                    <div className="nav-wrapper">
+                        <a href="#" className="brand-logo left"> SDC Events</a>
+                              <a href="#" data-activates="mobile-demo" className="button-collapse right"><i className="material-icons">menu</i></a>
+
+                        <ul id="nav-mobile" className="right hide-on-med-and-down">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="#">Logged in as {this.state.username}</a></li>
+                            <li><a href="#" onClick={() => {firebase.auth().signOut()}}>Sign Out</a></li>
+                        </ul>
+                        <ul class="side-nav right" id="mobile-demo">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="#">Logged in as {this.state.username}</a></li>
+                            <li><a href="#" onClick={() => {firebase.auth().signOut()}}>Sign Out</a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div className = "container"> 
+                        
+                    <h1 className="center">Sign Up</h1>
+                
+                    <h4>Upcoming Events</h4>
                     
-                <h1 className="center">Sign Up</h1>
-            
-                <h4>Upcoming Events</h4>
-                
-                
-                {
-                    this.state.events.map(function (e) {
-                        return <Event event = {e} />
-                    })
-                }
+                    
+                    {
+                        this.state.events.map( (e)=>{
+                            return <Event parent={this} event = {e} />
+                        })
+                    }
+                </div>
             </div>
         )
     }
@@ -98,16 +123,39 @@ class Event extends React.Component {
     }
 
     addPerson(p) {
-        console.log('called')
-        console.log(p)
-
-        firebase.database().ref("events/" + this.props.event.uuid + "/people/" + p.uuid).set({
-            name: firebase.auth().currentUser.email,
-            role: p.role,
-            uuid: p.uuid,
-            profilePicture: p.profilePicture
+        if (p.name.toLowerCase() != ("").toLowerCase()) {
+            Materialize.toast("This position has already been taken", 4000)
+            return
+        }
+        firebase.database().ref("users/" + firebase.auth().currentUser.uid + "/events/" + this.props.event.uuid).once('value').then((snapshot) => {
+            var events = snapshot.val()
+            var okay = false
+            //debugger
+            console.log(snapshot.val())
+            if (events && typeof events != 'undefined'){
+                Materialize.toast("You already have a job!", 4000)
+            }
+            else {
+                okay = true
+            }
+            console.log(okay)
+            if (okay == true) {
+                // take the job
+                 firebase.database().ref("events/" + this.props.event.uuid + "/people/" + p.uuid).set({
+                    name: firebase.auth().currentUser.email,
+                    role: p.role,
+                    uuid: p.uuid,
+                    profilePicture: p.profilePicture
+                })
+                this.props.parent.forceUpdate()
+                Materialize.toast(("Congrats! You now have the role " + p.role + " for " + this.props.event.type), 4000)
+                firebase.database().ref("users/" + firebase.auth().currentUser.uid + "/events/" + this.props.event.uuid).set({role: p.role, username: firebase.auth().currentUser.email})
+                //location.reload()
+            }
         })
-        //this.props.parent.forceUpdate()
+        
+
+       
     }
 
     downloadCalendarFile() {
@@ -179,8 +227,8 @@ class Event extends React.Component {
                                             }
                                         }>
                                         <div className="chip">
-                                            <img src={p.profilePicture} />
-                                            {p.name} - {p.role}
+                                            <img src={(p.profilePicture == "" ? "http://www.freeiconspng.com/uploads/profile-icon-9.png" : p.profilePicture)} />
+                                            {(p.name == "") ? "Click to Take" : p.name } - {p.role}
                                         </div>
                                         </a>
                                     )
@@ -215,76 +263,76 @@ class Post extends React.Component {
             }
         }
 
-        class TextForm extends React.Component {
-            constructor(props) {
-                super(props);
-                this.state = {
-                    value: ''
-                };
+//         class TextForm extends React.Component {
+//             constructor(props) {
+//                 super(props);
+//                 this.state = {
+//                     value: ''
+//                 };
 
-                this.handleContentChange = this.handleContentChange.bind(this);
-                this.handleHeaderChange = this.handleHeaderChange.bind(this);
-                this.handleSubmit = this.handleSubmit.bind(this);
-            }
+//                 this.handleContentChange = this.handleContentChange.bind(this);
+//                 this.handleHeaderChange = this.handleHeaderChange.bind(this);
+//                 this.handleSubmit = this.handleSubmit.bind(this);
+//             }
 
-            handleContentChange(event) {
-                this.setState({
-                    content: event.target.value
-                });
-            }
+//             handleContentChange(event) {
+//                 this.setState({
+//                     content: event.target.value
+//                 });
+//             }
 
-            handleHeaderChange(event) {
-                this.setState({
-                    header: event.target.value
-                });
-            }
+//             handleHeaderChange(event) {
+//                 this.setState({
+//                     header: event.target.value
+//                 });
+//             }
 
-            handleSubmit(event) {
-                posts.push({
-                    header: this.state.header,
-                    content: this.state.content
-                })
-                this.props.handler.forceUpdate()
+//             handleSubmit(event) {
+//                 posts.push({
+//                     header: this.state.header,
+//                     content: this.state.content
+//                 })
+//                 this.props.handler.forceUpdate()
 
-                //firebase
-                pushToServer(this.state.header, this.state.content)
+//                 //firebase
+//                 pushToServer(this.state.header, this.state.content)
 
-                event.preventDefault();
-            }
+//                 event.preventDefault();
+//             }
 
-            render() {
-                return ( <
-                    form onSubmit = {
-                        this.handleSubmit
-                    } >
+//             render() {
+//                 return ( <
+//                     form onSubmit = {
+//                         this.handleSubmit
+//                     } >
 
-                    <
-                    input placeholder = "Post Header"
-                    id = "first_name"
-                    type = "text"
-                    value = {
-                        this.state.header
-                    }
-                    onChange = {
-                        this.handleHeaderChange
-                    }
-                    className = "validate" / > < br / > < label > < textarea className = "materialize-textarea"
-type = "text"
-value = {
-    this.state.content
-}
-onChange = {
-    this.handleContentChange
-}
-placeholder = "Post Content" / > < /label><br / > < input className = "waves-effect waves-light btn"
-type = "submit"
-value = "Submit" / > < /form>
-                );
-            }
-        }
+//                     <
+//                     input placeholder = "Post Header"
+//                     id = "first_name"
+//                     type = "text"
+//                     value = {
+//                         this.state.header
+//                     }
+//                     onChange = {
+//                         this.handleHeaderChange
+//                     }
+//                     className = "validate" / > < br / > < label > < textarea className = "materialize-textarea"
+// type = "text"
+// value = {
+//     this.state.content
+// }
+// onChange = {
+//     this.handleContentChange
+// }
+// placeholder = "Post Content" / > < /label><br / > < input className = "waves-effect waves-light btn"
+// type = "submit"
+// value = "Submit" / > < /form>
+//                 );
+//             }
+//         }
 
 
-        ReactDOM.render( < App / >,
+         ReactDOM.render( < App / >,
 document.getElementById('app'))
 
 function pullFromServer() {
@@ -314,3 +362,4 @@ function pushToServer(h, c) {
         .push()
         .set({content: post.content, header: post.header});
 }
+$(".button-collapse").sideNav();
