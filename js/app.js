@@ -1,3 +1,5 @@
+
+
 var posts = [
     {
         header: "This is a Title",
@@ -15,23 +17,32 @@ var config = {
 };
 firebase.initializeApp(config);
 
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+  } else {
+    // No user is signed in.
+    alert("You are not signed in! Redirecting you to login")
+    window.location.href = "/"
+  }
+});
 class App extends React.Component {
     constructor() {
         super();
         this.state = {
             events: [
-                {
-                    location: "13330 Salmon River Rd, San Diego, CA 92129",
-                    type: "Workshop",
-                    date: "7/27/17",
-                    people: [
-                        {
-                            name: "Not Filled",
-                            role: "Lead",
-                            profilePicture: "https://thumb1.shutterstock.com/display_pic_with_logo/4342048/465585254/stock-vector-facebook-profile-icon-vector-social-media-illustration-eps-fb-person-flat-ui-sign-user-interface-465585254.jpg"
-                        }
-                    ]
-                }
+                // {
+                //     location: "13330 Salmon River Rd, San Diego, CA 92129",
+                //     type: "Workshop",
+                //     date: "7/27/17",
+                //     people: [
+                //         {
+                //             name: "Not Filled",
+                //             role: "Lead",
+                //             profilePicture: "https://thumb1.shutterstock.com/display_pic_with_logo/4342048/465585254/stock-vector-facebook-profile-icon-vector-social-media-illustration-eps-fb-person-flat-ui-sign-user-interface-465585254.jpg"
+                //         }
+                //     ]
+                // }
             ],
             posts: [
                 {
@@ -64,7 +75,7 @@ class App extends React.Component {
             <div className = "container"> 
                     
                 <h1 className="center">Sign Up</h1>
-                
+            
                 <h4>Upcoming Events</h4>
                 
                 
@@ -83,13 +94,24 @@ class Event extends React.Component {
     constructor(props) {
         super(props)
         this.downloadCalendarFile = this.downloadCalendarFile.bind(this)
-        this.addPerson = this.addPerson.bind(this)
+        //this.addPerson = this.addPerson.bind(this)
     }
 
-    addPerson(data) {
-        //console.log(data)
+    addPerson(p) {
+        console.log('called')
+        console.log(p)
+
+        firebase.database().ref("events/" + this.props.event.uuid + "/people/" + p.uuid).set({
+            name: firebase.auth().currentUser.email,
+            role: p.role,
+            uuid: p.uuid,
+            profilePicture: p.profilePicture
+        })
+        //this.props.parent.forceUpdate()
     }
+
     downloadCalendarFile() {
+        console.log('preparing ics')
         var icsFile = `
         BEGIN:VCALENDAR
         VERSION:2.0
@@ -138,6 +160,7 @@ class Event extends React.Component {
 
     render() {
         //console.log('this far')
+        console.log(this.props.event)
         return (
             <div className="row">
                 <div className="col s12">
@@ -150,7 +173,11 @@ class Event extends React.Component {
                                 this.props.event.people.map((p) => {
                                     //console.log(this)
                                     return (
-                                        <a href="#!">
+                                        <a href="#!" person={p} onClick={
+                                            () => { 
+                                                this.addPerson(p)
+                                            }
+                                        }>
                                         <div className="chip">
                                             <img src={p.profilePicture} />
                                             {p.name} - {p.role}
@@ -166,7 +193,7 @@ class Event extends React.Component {
                                         
                         </div>
                             <div className="card-action">
-                            <a href="#" onClick={this.downloadCalendarFile()}>Add To Calendar</a>
+                            <a href="#" onClick={this.downloadCalendarFile}>Add To Calendar</a>
                         </div>
                     </div>
                 </div>
