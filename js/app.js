@@ -22,8 +22,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     // User is signed in.
   } else {
     // No user is signed in.
-    alert("You are not signed in! Redirecting you to login")
-    window.location.href = "/"
+    Materialize.toast("You are being logged out", 1000, '', function(){window.location.href = "/"})
   }
 });
 class App extends React.Component {
@@ -250,20 +249,20 @@ class Event extends React.Component {
     }
 
 }
-class Post extends React.Component {
-        render() {
-            return ( <
-                div className = 'post' > < div className = 'container' >
-                <
-                h5 > {
-                    this.props.data.header
-                } < /h5 > < p > {
-    this.props.data.content
-} < /p></div > < /div>)
-            }
-        }
+// class Post extends React.Component {
+//         render() {
+//             return ( <
+//                 div className = 'post' > < div className = 'container' >
+//                 <
+//                 h5 > {
+//                     this.props.data.header
+//                 } < /h5 > < p > {
+//     this.props.data.content
+// } < /p></div > < /div>)
+//             }
+//         }
 
-//         class TextForm extends React.Component {
+// //         class TextForm extends React.Component {
 //             constructor(props) {
 //                 super(props);
 //                 this.state = {
