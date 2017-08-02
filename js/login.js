@@ -20,7 +20,7 @@ class App extends React.Component {
             <a href="#" className="brand-logo">SDC Events</a>
             <ul id="nav-mobile" className="right hide-on-med-and-down">
               <li><a href="/">Home</a></li>
-              <li><a href="events">Events</a></li>
+              <li><a href="main">Events</a></li>
             </ul>
           </div>
         </nav>
@@ -142,7 +142,7 @@ class SignUp extends React.Component {
                 </div>
                 <div className="row">
                   <div className="input-field col s12">
-                    <input id="photo" type="url" placeholder= "Keep it Professional" className="validate"/>
+                    <input id="photo" type="url" placeholder= "Paste the Image Url Here (Keep it Professional)" className="validate"/>
                     <label for="photo">Profile Picture</label>
                   </div>
                 </div>

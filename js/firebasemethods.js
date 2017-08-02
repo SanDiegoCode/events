@@ -36,7 +36,9 @@ firebase.createUser = (name, email, password, url) => {
 firebase.login = (email, password) => {
   // Sign in with email and pass.
   // [START authwithemail]
-  firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+  firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+    window.location.href = "main"
+  },function(error) {
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
