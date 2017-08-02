@@ -6,11 +6,17 @@ firebase.createUser = (name, email, password, url) => {
     // [END createwithemail]
     // callSomeFunction(); Optional
     // var user = firebase.auth().currentUser;
+    if (email.indexOf("sdcoding") == -1) {
+      Materialize.toast("Please use your sdcoding.com email", 2000)
+      return
+    }
     user.updateProfile({
         displayName: name,
         photoURL: url
     }).then(function() {
-        // Update successful.
+        // Update successful
+            window.location.href = "main"
+
     }, function(error) {
         // An error happened.
     });        
@@ -41,9 +47,10 @@ firebase.login = (email, password) => {
     else if (errorCode === 'auth/user-not-found') {
       Materialize.toast('User Not Found', 4000)
     }
-    else {
-      //alert(errorMessage);
-    }
+        else {
+              window.location.href = "main"
+
+        }
     console.log(error);
 
     // [END_EXCLUDE]

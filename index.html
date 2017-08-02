@@ -37,18 +37,6 @@
   firebase.initializeApp(config);
 
 
-  function redirect() {
-    window.location.href = "main"
-  }
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      // User is signed in.
-      redirect()
-    } else {
-      // No user is signed in.
-
-    }
-  });
 </script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.min.js'></script>

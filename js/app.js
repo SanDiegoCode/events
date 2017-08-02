@@ -55,21 +55,31 @@ class App extends React.Component {
 
     componentDidMount() {
         var that = this;
-        firebase
-            .database()
-            .ref("events")
-            .on("child_added", (child) => {
-                        console.log('mounting')
+        firebase.database().ref("events").on("child_added", (child) => {
 
-                var p = that.state.events;
-                console.log(child.val());
-                p.push(child.val());
-                that.setState({posts: p, username: firebase.auth().currentUser.email});
-                //that.forceUpdate()
-                console.log('force update')
-            }, (error) => {
+            var p = that.state.events;
+            console.log(child.val());
+            p.push(child.val());
+            that.setState({posts: p, username: firebase.auth().currentUser.displayName});
+            that.forceUpdate()
+
+        }, 
+        (error) => {
                 console.log("error");
-            });
+        });
+            
+        // firebase.database().ref("events").on("child_changed", (child) => {
+        //     var p = that.state.events;
+
+            
+        //     p.push(child.val());
+        //     that.setState({posts: p, username: firebase.auth().currentUser.displayName});
+        //     that.forceUpdate()
+
+        // }, 
+        // (error) => {
+        //         console.log("error");
+        // });
         $(".button-collapse").sideNav();
 
     }
@@ -141,13 +151,16 @@ class Event extends React.Component {
             if (okay == true) {
                 // take the job
                  firebase.database().ref("events/" + this.props.event.uuid + "/people/" + p.uuid).set({
-                    name: firebase.auth().currentUser.email,
+                    name: firebase.auth().currentUser.displayName,
                     role: p.role,
                     uuid: p.uuid,
-                    profilePicture: p.profilePicture
+                    personId: firebase.auth().currentUser.uid,
+                    profilePicture: firebase.auth().currentUser.photoURL
                 })
                 this.props.parent.forceUpdate()
-                Materialize.toast(("Congrats! You now have the role " + p.role + " for " + this.props.event.type), 4000)
+                Materialize.toast(("Congrats! You now have the role " + p.role + " for " + this.props.event.type), 2000, '', function() {location.reload()})
+
+                this.props.parent.setState({render: true})
                 firebase.database().ref("users/" + firebase.auth().currentUser.uid + "/events/" + this.props.event.uuid).set({role: p.role, username: firebase.auth().currentUser.email})
                 //location.reload()
             }
