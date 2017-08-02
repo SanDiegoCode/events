@@ -22,7 +22,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     // User is signed in.
   } else {
     // No user is signed in.
-    Materialize.toast("You are being logged out", 1000, '', function(){window.location.href = "/"})
+    //Materialize.toast("You are being logged out", 1000, '', function(){window.location.href = "/"})
   }
 });
 class App extends React.Component {
@@ -96,12 +96,18 @@ class App extends React.Component {
                         <ul id="nav-mobile" className="right hide-on-med-and-down">
                             <li><a href="/">Home</a></li>
                             <li><a href="#">Logged in as {this.state.username}</a></li>
-                            <li><a href="#" onClick={() => {firebase.auth().signOut()}}>Sign Out</a></li>
+                            <li><a href="#" onClick={() => {
+                                firebase.auth().signOut()
+                                Materialize.toast("You are being signed out", 2000, '', () => {window.location.href = "/"})
+                                }}>Sign Out</a></li>
                         </ul>
                         <ul class="side-nav right" id="mobile-demo">
                             <li><a href="/">Home</a></li>
                             <li><a href="#">Logged in as {this.state.username}</a></li>
-                            <li><a href="#" onClick={() => {firebase.auth().signOut()}}>Sign Out</a></li>
+                            <li><a href="#" onClick={() => {
+                                firebase.auth().signOut()
+                                Materialize.toast("You are being signed out", 2000, '', () => {window.location.href = "/"})
+                                }}>Sign Out</a></li>
                         </ul>
                     </div>
                 </nav>
